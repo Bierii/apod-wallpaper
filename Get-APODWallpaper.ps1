@@ -31,10 +31,10 @@ Function Get-APODImage($date, $ImagePath){
 
     $htmlRet = $htmlRet -split "`n"
     
-    $picLine = $htmlRet | ? { $_ -like '*<a href="image/*' }
+    $picLine = $htmlRet | ? { $_ -like '*<img src="image/*' }
     $picDescr = $htmlRet | ? { $_ -like '*<title> APOD:*' }
 
-    $imagePathPart = $picLine -replace '<a href="' -replace '"'
+    $imagePathPart = $picLine -replace '<img src="' -replace '"'
     $imageDescr = $picDescr.Substring($picDescr.IndexOf("-")+2) -replace " ","_"
     $validateRegex = "[{0}]" -f ([Regex]::Escape( [System.IO.Path]::GetInvalidFileNameChars() -join '' ))
     $imageDescr = $imageDescr -replace "$validateRegex","_"
@@ -51,7 +51,7 @@ Function Set-Wallpaper{
     param
     (
         [Parameter(Mandatory=$true)]$Path,
-        [ValidateSet('Center', 'Stretch')]$Style = 'Stretch'
+        [ValidateSet('Center', 'Stretch')]$Style = 'Center'
     )
     
     Add-Type @"

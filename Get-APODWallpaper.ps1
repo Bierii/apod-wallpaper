@@ -18,38 +18,31 @@
 	
 #>
 
-Function Get-APODImage(){
+Function Get-APODImage($date, $ImagePath){
                 
-    param 
-    ( 
-        [parameter(Mandatory=$true)][datetime]$date,
-        [parameter(Mandatory=$true)][string]$ImagePath
-    )
-    
-    $date = $date.ToUniversalTime()
-
     $year = $date.ToString("yy")
     $month = $date.ToString("MM")
     $day = $date.ToString("dd")
-
+	
     $webClient = New-Object System.Net.WebClient
     $webClient.UseDefaultCredentials = $true
     $webClient.Proxy.Credentials = $webClient.Credentials
-    $htmlRet = $webClient.DownloadString("http://apod.nasa.gov/apod/ap$($year)$($month)$($day).html")
+    $htmlRet = $webClient.DownloadString("https://apod.nasa.gov/apod/ap$($year)$($month)$($day).html")
 
     $htmlRet = $htmlRet -split "`n"
     
-    $picLine = $htmlRet | ? { $_ -like '*<a href="image/*' }
+    $picLine = $htmlRet | ? { $_ -like '*<img src="image/*' }
     $picDescr = $htmlRet | ? { $_ -like '*<title> APOD:*' }
 
-    $imagePathPart = $picLine -replace '<a href="' -replace '">'
+    $imagePathPart = $picLine -replace '<img src="' -replace '"'
     $imageDescr = $picDescr.Substring($picDescr.IndexOf("-")+2) -replace " ","_"
     $validateRegex = "[{0}]" -f ([Regex]::Escape( [System.IO.Path]::GetInvalidFileNameChars() -join '' ))
     $imageDescr = $imageDescr -replace "$validateRegex","_"
     
     $imageSavePath = "$($ImagePath)\APOD_$(Get-Date -Format "yyyy_MM_dd")_$($imageDescr).jpg"
-    $webClient.DownloadFile("http://apod.nasa.gov/apod/$($imagePathPart)", $imageSavePath)
-
+	
+    $webClient.DownloadFile("https://apod.nasa.gov/apod/$($imagePathPart)", $imageSavePath)
+	
     return $imageSavePath
 }
 
@@ -58,7 +51,7 @@ Function Set-Wallpaper{
     param
     (
         [Parameter(Mandatory=$true)]$Path,
-        [ValidateSet('Center', 'Stretch')]$Style = 'Stretch'
+        [ValidateSet('Center', 'Stretch')]$Style = 'Center'
     )
     
     Add-Type @"
@@ -104,8 +97,9 @@ Function Set-Wallpaper{
     [Wallpaper.Setter]::SetWallpaper( $Path, $Style )
 }
 
-Function Main(){
 
+
+Function Main(){
     $executionPath = "$(Split-Path -parent $PSCommandPath)"
     $logPath = "$($executionPath)\APOD\logs"
     $imagePath = "$($executionPath)\APOD\image"
@@ -122,8 +116,7 @@ Function Main(){
     
     $path = $(Get-APODImage $(Get-Date) $($imagePath))
 	
-	Set-Wallpaper -Path $path 
-
+	Set-Wallpaper -Path $path	
 }
 
 Main

@@ -9,8 +9,7 @@
     In that folder all pictures are saved with date and description.
 
 # .NOTES  
-    File Name  : Get-APODWallpaper.ps1  
-    Author     : Yanik Bieri - yanikbieri.ch 
+    File Name  : Get-APODWallpaper.ps1   
     Requires   : PowerShell V4
 
 # .LINK 

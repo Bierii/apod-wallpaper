@@ -12,5 +12,4 @@
     File Name  : Get-APODWallpaper.ps1   
     Requires   : PowerShell V4
 
-# .LINK 
-    http://yanikbieri.ch/home/category/apod-wallpaper/
+# .LINK
